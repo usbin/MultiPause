@@ -47,11 +47,18 @@ time as possible depending on the actions of their fellow players.
 If a player with the lowest cumulative pause time enters a single-player-paused state for long enough that they no longer have the lowest time, the game will automatically look
 for the new lowest-time player, and pause/unpause time based on their single-player-paused state instead.
 _**NOTE:** For players who do not have the lowest cumulative pause time it may appear that time pauses at arbitrary times when it would otherwise not pause.
-This may be frustrating if you are waiting for a time-based event such as a shop opening. In this case, kindly get mad at your fellow players and tell them to unpause so you can
-do the thing. Gosh. If this really gets too annoying, consider using `"ALL"` mode instead._
+This may be frustrating if you are waiting for a time-based event such as a shop opening. In this case, kindly get mad at your fellow players and tell them to unpause so you can do the thing. Gosh. If this really gets too annoying, consider using `"ALL"` mode instead._
 
 ### `"EVENTONLY"` mode(Added in version 1.1.3)
 The game will pause if only **any** player is in a **NPCs event** state.
 Time doesn't stop when you open your bag, stay indoors, or take some tree-cutting actions!
 If too much time loss occurs even in other modes, you can use **EVENTONLY** mode to stop time only when NPCs event occurs.
 
+
+<hr/>
+<h1>Version History(Latest Version : 1.1.3)</h1>
+Authorship : Taw(GitHub:Tawling/MultiPause) - version 1.1.2<br/><br/>
+
+
+> _<Version 1.1.3><br/>
+`-` Pause mode added - "EVENTONLY" mode._

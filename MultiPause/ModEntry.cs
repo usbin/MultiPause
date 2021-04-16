@@ -1,12 +1,4 @@
-﻿/*
- *      Authorship : Taw (GitHub:Tawling/MultiPause)
- *      Modifier : usbin (GitHub:usbin/MultiPause)
- *      Added features : Pause mode added - "EVENTONLY" mode.
- *
- */
-
-
-using Harmony;
+﻿using Harmony;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
