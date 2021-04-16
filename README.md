@@ -52,13 +52,13 @@ This may be frustrating if you are waiting for a time-based event such as a shop
 ### `"EVENTONLY"` mode(Added in version 1.1.3)
 The game will pause if only **any** player is in a **NPCs event** state.
 Time doesn't stop when you open your bag, stay indoors, or take some tree-cutting actions!
-If too much time loss occurs even in other modes, you can use **EVENTONLY** mode to stop time only when NPCs event occurs.
+If too much time loss occurs even in other modes, you can use **EVENTONLY** mode to stop time only when NPCs event occurs.<br/><br/>
 
 
 <hr/>
-<h1>Version History(Latest Version : 1.1.3)</h1>
+<h3>Version History(Latest Version : 1.1.3)</h3>
 Authorship : Taw(GitHub:Tawling/MultiPause) - version 1.1.2<br/><br/>
 
 
 > _<Version 1.1.3><br/>
-`-` Pause mode added - "EVENTONLY" mode._
+- Pause mode added - "EVENTONLY" mode._
