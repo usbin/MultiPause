@@ -1,5 +1,5 @@
 ﻿{
-  "Name": "MultiPause(Eventonly added)",
+  "Name": "MultiPause",
   "Author": "usbin(Authorship: Taw)",
   "Version": "1.1.3",
   "Description": "Adds mechanisms for time to be paused in multi-player when players are in menus or other situations that would normally pause time in single-player mode.",
