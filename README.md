@@ -61,4 +61,4 @@ Authorship : Taw(GitHub:Tawling/MultiPause) - version 1.1.2<br/><br/>
 
 
 > _<Version 1.1.3><br/>
-- Pause mode added - "EVENTONLY" mode._
+\- Pause mode added - "EVENTONLY" mode._
