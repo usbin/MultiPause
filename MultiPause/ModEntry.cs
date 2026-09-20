@@ -20,7 +20,8 @@ namespace MultiPause
         public const string PAUSE_AUTO = "AUTO";
         public const string PAUSE_EVENTONLY = "EVENTONLY";
 
-        private Event LastEvent;
+        //분할화면에서 화면끼리 공유되면 이벤트 시작/종료 감지가 꼬이므로 PerScreen이어야 한다.
+        private PerScreen<Event> LastEvent = new PerScreen<Event>(() => null);
         public enum TimePassState
         {
             Pass,
@@ -34,7 +35,9 @@ namespace MultiPause
 
         public PerScreen<bool> IsPaused = new PerScreen<bool>(() => false);
         public PerScreen<bool> QueryMessageSent = new PerScreen<bool>(() => false);
-        public PerScreen<string> PauseMode { get; set; } = new PerScreen<string>(() => string.Empty);
+        //GetTimePassState()가 정적 메서드라 static이어야 한다. Entry()가 돌지 않은 화면을 위해
+        //빈 문자열 대신 자기 Config 값으로 초기화한다.
+        public static PerScreen<string> PauseMode { get; set; } = new PerScreen<string>(() => Config.Value.PauseMode_ANY_ALL_AUTO_EVENTONLY.ToUpper());
         public PerScreen<bool> InitialPauseState => new PerScreen<bool>(() => PauseMode.Value != PAUSE_ANY);
         private PerScreen<int> prevGameTimeInterval = new PerScreen<int>(() => -1);
         private PerScreen<TimePassState> prevTimePassState = new PerScreen<TimePassState>(() => TimePassState.Pass);
@@ -133,22 +136,26 @@ namespace MultiPause
                     }
                 }
 
+                //이벤트 상태가 이번 틱에 바뀌었는지. 바뀌었다면 다른 플레이어에게 알려야 한다.
+                bool eventingChanged = false;
+
                 //이벤트가 시작됐을 때
-                if(this.LastEvent == null && Game1.CurrentEvent != null)
+                if(this.LastEvent.Value == null && Game1.CurrentEvent != null)
                 {
                     //이벤트중 상태 추가.
                     var state = GetPlayerState(Game1.player.UniqueMultiplayerID);
                     state.IsEventing = true;
-
+                    eventingChanged = true;
                 }
                 //이벤트가 끝났을 때
-                if(this.LastEvent != null && Game1.CurrentEvent == null)
+                if(this.LastEvent.Value != null && Game1.CurrentEvent == null)
                 {
                     //이벤트중 상태 추가.
                     var state = GetPlayerState(Game1.player.UniqueMultiplayerID);
                     state.IsEventing = false;
+                    eventingChanged = true;
                 }
-                this.LastEvent = Game1.CurrentEvent;
+                this.LastEvent.Value = Game1.CurrentEvent;
 
                 // Retrieve state as if in single player
                 ForceSinglePlayerCheck.Value = true;
@@ -156,7 +163,7 @@ namespace MultiPause
                 ForceSinglePlayerCheck.Value = false;
 
                 // Check player's pause state and broadcast changes
-                if (isPaused != IsPaused.Value)
+                if (isPaused != IsPaused.Value || eventingChanged)
                 {
                     IsPaused.Value = isPaused;
                     var state = GetPlayerState(Game1.player.UniqueMultiplayerID);
@@ -234,6 +241,7 @@ namespace MultiPause
                     state.IsPaused = messageState.IsPaused;
                     state.IsHost = messageState.IsHost;
                     state.ConfigPauseMode = messageState.ConfigPauseMode;
+                    state.IsEventing = messageState.IsEventing;
                     if (state.IsHost && PauseMode.Value != state.ConfigPauseMode)
                         PauseMode.Value = state.ConfigPauseMode;
                 }
@@ -258,6 +266,9 @@ namespace MultiPause
                     state.IsOnline = item.Value.IsOnline;
                     state.IsHost = item.Value.IsHost;
                     state.ConfigPauseMode = item.Value.ConfigPauseMode;
+                    //자기 자신의 이벤트 상태는 로컬 값이 항상 최신이므로 덮어쓰지 않는다.
+                    if (item.Key != Game1.player.UniqueMultiplayerID)
+                        state.IsEventing = item.Value.IsEventing;
                 }
             }
         }
@@ -326,7 +337,9 @@ namespace MultiPause
         {
             bool freeze = false;
             bool allPaused = true;
-            if (Config.Value.PauseMode_ANY_ALL_AUTO_EVENTONLY.ToUpper() == PAUSE_ALL)
+            //호스트로부터 동기화된 PauseMode를 쓴다. 로컬 Config를 직접 읽으면
+            //플레이어마다 다른 판정을 내려 설계 전제가 깨진다.
+            if (PauseMode.Value == PAUSE_ALL)
             {
                 foreach (Farmer farmer in Game1.getOnlineFarmers())
                 {
@@ -338,7 +351,7 @@ namespace MultiPause
                 }
                 freeze = allPaused;
             }
-            else if (Config.Value.PauseMode_ANY_ALL_AUTO_EVENTONLY.ToUpper() == PAUSE_ANY)
+            else if (PauseMode.Value == PAUSE_ANY)
             {
                 foreach (Farmer farmer in Game1.getOnlineFarmers())
                 {
@@ -356,7 +369,7 @@ namespace MultiPause
                     }
                 }
             }
-            else if (Config.Value.PauseMode_ANY_ALL_AUTO_EVENTONLY.ToUpper() == PAUSE_AUTO)
+            else if (PauseMode.Value == PAUSE_AUTO)
             {
                 int min = Int32.MaxValue;
                 foreach (Farmer farmer in Game1.getOnlineFarmers())
@@ -379,7 +392,7 @@ namespace MultiPause
                 }
             }
             //이벤트 중일 때만 freeze=true
-            else if (Config.Value.PauseMode_ANY_ALL_AUTO_EVENTONLY.ToUpper() == PAUSE_EVENTONLY)
+            else if (PauseMode.Value == PAUSE_EVENTONLY)
             {
                 int min = Int32.MaxValue;
                 foreach(Farmer farmer in Game1.getOnlineFarmers())
